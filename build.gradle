@@ -1,0 +1,65 @@
+plugins {
+    id 'java'
+}
+
+group 'org.pike.sean'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    junit5Version = "5.7.1"
+    junit4Version = "4.13"
+    cucumberVersion = "6.8.1"
+    picoContainerVersion = "6.8.1"
+    gsonVersion="2.8.6"
+    restAssuredVersion = "3.0.0"
+    cucumberReport="report"
+}
+
+configurations {
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+task cucumber() {
+    dependsOn assemble, testClasses
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty',
+                    '--plugin', "json:${cucumberReport}/report.json",
+                    '--plugin', "html:${cucumberReport}/index.html",
+                    '--glue', 'gradle.cucumber', 'src/test/resources']
+        }
+    }
+}
+
+dependencies {
+    //Junit 4 & Junit 5 vintage engine required for cucumber
+    testImplementation "junit:junit:${junit4Version}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junit5Version}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junit5Version}"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${junit5Version}"
+
+    //Cucumber
+    testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
+    testImplementation "io.cucumber:cucumber-junit:${cucumberVersion}"
+
+    //Allow global variable sharing between steps
+    testImplementation "io.cucumber:cucumber-picocontainer:${cucumberVersion}"
+
+    //JSON handling
+    implementation "com.google.code.gson:gson:${gsonVersion}"
+
+    //API requests
+    testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
+}
