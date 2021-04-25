@@ -15,7 +15,7 @@ ext {
     cucumberVersion = "6.8.1"
     picoContainerVersion = "6.8.1"
     gsonVersion="2.8.6"
-    restAssuredVersion = "3.0.0"
+    restAssuredVersion = "4.3.3"
     cucumberReport="report"
 }
 
@@ -38,7 +38,7 @@ task cucumber() {
             args = ['--plugin', 'pretty',
                     '--plugin', "json:${cucumberReport}/report.json",
                     '--plugin', "html:${cucumberReport}/index.html",
-                    '--glue', 'gradle.cucumber', 'src/test/resources']
+                    '--glue', 'stepdefs']
         }
     }
 }
@@ -62,4 +62,5 @@ dependencies {
 
     //API requests
     testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
+    testImplementation "io.rest-assured:json-schema-validator:${restAssuredVersion}"
 }
